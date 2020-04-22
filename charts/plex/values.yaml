@@ -101,11 +101,6 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> Add PlexPreferences ConfigMap/Script.
 plexPreferences:
   # Enable init script that will read all environment variables starting with PLEX_PREFERENCE_
   # and take the value (of PLEX_PREFERENCE_<whatever>) as the Key:Value option to set in Plex Preference.xml

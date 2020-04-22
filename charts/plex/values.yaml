@@ -43,10 +43,8 @@ timezone: "UTC"
 # plexGid: 1000
 
 #####   END  --> Official PLEX container environment variables
-
-
 # You can add as many Additional ENV variables here
-# The following is the same as --set extraEnv.TMPDIR="/transcode"
+# The following is the same as --set extraEnv.TMPDIR="/transcode" 
 # extraEnv:
 #   TMPDIR: /transcode
 

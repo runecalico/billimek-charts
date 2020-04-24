@@ -8,6 +8,12 @@ if [ "${DEBUG,,}" = "true" ]; then
   set -x
 fi
 
+function getPref {
+  local key="$1"
+
+  xmlstarlet sel -T -t -m "/Preferences" -v "@${key}" -n "${prefFile}"
+}
+
 function setPref {
   local key="$1"
   local value="$2"

@@ -160,11 +160,7 @@ persistence:
     # If not using a transcode PVC, specify emptyDir.medium="Memory" to use a tmpfs (in-memory)
     # Volume for /transcode. Warning! this will greatly increase the amount of memory the plex pod is using
     # AND it will count toward any ram pod/namespace limits. Additionally all data will be lost if/when the
-<<<<<<< HEAD
-    # pod is moved to another node. --set persistence.transcode.emptyDir.medium="Memory" `
-=======
-    # pod is moved to another node. --set persistence.transcode.emptyDir.medium="Memory" ` 
->>>>>>> set default empty value for medium
+    # pod is moved to another node. --set persistence.transcode.emptyDir.medium="Memory" 
     emptyDir:
       medium: ""
   #   medium: "Memory"

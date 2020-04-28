@@ -2,7 +2,7 @@
 
 # This file contains part of the official PLEX 40-plex-first-run
 # Here: https://github.com/plexinc/pms-docker/blob/master/root/etc/cont-init.d/40-plex-first-run
-# It should live in /etc/cont-init.d/
+# It should live in /etc/cont-init.d
 
 # If we are debugging, enable trace
 if [ "${DEBUG,,}" = "true" ]; then

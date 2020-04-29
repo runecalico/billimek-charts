@@ -40,3 +40,69 @@ data:
 # a different file or something.
 {{ (tpl (.Files.Glob "configs/42-pkcs-mangler").AsConfig . ) | indent 2 }}
 {{- end -}}
+
+{{- if .Values.addons.lambda.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.addons.lambda.configmap.name }}
+  labels:
+    {{- include "plex.labels" . | nindent 4 }}
+{{- if .Values.addons.lambda.configmap.labels }}
+{{ toYaml .Values.addons.lambda.configmap.labels | indent 4 }}
+{{- end }}
+{{- with .Values.addons.lambda.configmap.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+
+data:
+# At some point figure out how to use a value/Variable here to be able to specify
+# a different file or something.
+{{ (tpl (.Files.Glob "configs/install-lambda.sh").AsConfig . ) | indent 2 }}
+{{- end -}}
+
+{{- if .Values.addons.AbsoluteSeriesScanner.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.addons.AbsoluteSeriesScanner.configmap.name }}
+  labels:
+    {{- include "plex.labels" . | nindent 4 }}
+{{- if .Values.addons.AbsoluteSeriesScanner.configmap.labels }}
+{{ toYaml .Values.addons.AbsoluteSeriesScanner.configmap.labels | indent 4 }}
+{{- end }}
+{{- with .Values.addons.AbsoluteSeriesScanner.configmap.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+
+data:
+# At some point figure out how to use a value/Variable here to be able to specify
+# a different file or something.
+{{ (tpl (.Files.Glob "configs/install-AbsoluteSeriesScanner.sh").AsConfig . ) | indent 2 }}
+{{- end -}}
+
+{{- if .Values.addons.hama.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.addons.hama.configmap.name }}
+  labels:
+    {{- include "plex.labels" . | nindent 4 }}
+{{- if .Values.addons.hama.configmap.labels }}
+{{ toYaml .Values.addons.hama.configmap.labels | indent 4 }}
+{{- end }}
+{{- with .Values.addons.hama.configmap.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+
+data:
+# At some point figure out how to use a value/Variable here to be able to specify
+# a different file or something.
+{{ (tpl (.Files.Glob "configs/install-hama.sh").AsConfig . ) | indent 2 }}
+{{- end -}}

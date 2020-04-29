@@ -35,7 +35,7 @@ spec:
     {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-  {{- if .Values.certificate.pkcsMangler.enabled }}
+  {{- if or .Values.certificate.pkcsMangler.enabled .Values.addons.lambda.enabled .Values.addons.AbsoluteSeriesScanner.enabled .Values.addons.hama.enabled }}
       initContainers:
       # This is ugly, but it does work to create a pks file that will work with PLEX from the tls.crt and tls.key that cert-manager normally creates
       {{- if .Values.certificate.pkcsMangler.enabled }}
@@ -55,6 +55,89 @@ spec:
           mountPath: /shared
         - name: {{ .Values.certificate.pkcsMangler.certificateSecret.volume.name }}
           mountPath: {{ .Values.certificate.pkcsMangler.certificateSecret.volume.mountPath }}
+      {{- end }}
+      {{- if .Values.addons.lambda.enabled }}
+      - name: lambda-init-container
+        image: alpine:latest
+        imagePullPolicy: Always
+        command: ["/bin/sh"]
+        args: ["-c", "{{ .Values.addons.lambda.volume.mountPath }}"]
+        env:
+          - name: "OVERWRITE_EXISTING_PLUGIN"
+            value: "true"
+          - name: "TMPDIR"
+            value: "/tmp"
+          - name: "CONFIG_DIR"
+            value: "/config"
+          - name: "PINAME"
+            value: "Lambda.bundle"
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          {{- if .Values.persistence.config.subPath }}
+            subPath: {{ .Values.persistence.config.subPath }}
+          {{ end }}
+          - name: {{ .Values.addons.lambda.volume.name }}
+            mountPath: {{ .Values.addons.lambda.volume.mountPath }}
+            subPath: {{ .Values.addons.lambda.volume.subPath }}
+      {{- end }}
+      {{- if .Values.addons.hama.enabled }}
+      - name: hama-init-container
+        image: alpine:latest
+        imagePullPolicy: Always
+        command: ["/bin/sh"]
+        args: ["-c", "{{ .Values.addons.hama.volume.mountPath }}"]
+        env:
+          - name: "OVERWRITE_EXISTING_PLUGIN"
+            value: "true"
+          - name: "TMPDIR"
+            value: "/tmp"
+          - name: "CONFIG_DIR"
+            value: "/config"
+          - name: "PINAME"
+            value: "Hama.bundle"
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          {{- if .Values.persistence.config.subPath }}
+            subPath: {{ .Values.persistence.config.subPath }}
+          {{ end }}
+          - name: {{ .Values.addons.hama.volume.name }}
+            mountPath: {{ .Values.addons.hama.volume.mountPath }}
+            subPath: {{ .Values.addons.hama.volume.subPath }}
+      {{- end }}
+      {{- if .Values.addons.AbsoluteSeriesScanner.enabled }}
+      - name: absoluteseriesscanner-init-container
+        image: alpine:latest
+        imagePullPolicy: Always
+        command: ["/bin/sh"]
+        args: ["-c", "{{ .Values.addons.AbsoluteSeriesScanner.volume.mountPath }}"]
+        env:
+          - name: "OVERWRITE_EXISTING_PLUGIN"
+            value: "true"
+          - name: "TMPDIR"
+            value: "/tmp"
+          - name: "CONFIG_DIR"
+            value: "/config"
+          - name: "PINAME"
+            value: "AbsoluteSeriesScanner"
+          {{- if .Values.plexUid }}
+          - name: "PLEX_UID"
+            value: "{{.Values.plexUid}}"
+          {{- end }}
+          {{- if .Values.plexGid }}
+          - name: "PLEX_GID"
+            value: "{{.Values.plexGid}}"
+          {{- end }}
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          {{- if .Values.persistence.config.subPath }}
+            subPath: {{ .Values.persistence.config.subPath }}
+          {{ end }}
+          - name: {{ .Values.addons.AbsoluteSeriesScanner.volume.name }}
+            mountPath: {{ .Values.addons.AbsoluteSeriesScanner.volume.mountPath }}
+            subPath: {{ .Values.addons.AbsoluteSeriesScanner.volume.subPath }}
       {{- end }}
   {{- end }}
       containers:
@@ -251,6 +334,24 @@ spec:
         configMap:
           name: {{ .Values.plexPreferences.configmap.name }}
           defaultMode: {{ .Values.plexPreferences.volume.defaultMode }}
+      {{- end }}
+      {{- if .Values.addons.lambda.enabled }}
+      - name: {{ .Values.addons.lambda.volume.name }}
+        configMap:
+          name: {{ .Values.addons.lambda.configmap.name }}
+          defaultMode: {{ .Values.addons.lambda.volume.defaultMode }}
+      {{- end }}
+      {{- if .Values.addons.hama.enabled }}
+      - name: {{ .Values.addons.hama.volume.name }}
+        configMap:
+          name: {{ .Values.addons.hama.configmap.name }}
+          defaultMode: {{ .Values.addons.hama.volume.defaultMode }}
+      {{- end }}
+      {{- if .Values.addons.AbsoluteSeriesScanner.enabled }}
+      - name: {{ .Values.addons.AbsoluteSeriesScanner.volume.name }}
+        configMap:
+          name: {{ .Values.addons.AbsoluteSeriesScanner.configmap.name }}
+          defaultMode: {{ .Values.addons.AbsoluteSeriesScanner.volume.defaultMode }}
       {{- end }}
       {{- if .Values.certificate.pkcsMangler.enabled }}
       - name: {{ .Values.certificate.pkcsMangler.volume.name }}

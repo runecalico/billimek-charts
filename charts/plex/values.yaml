@@ -160,7 +160,7 @@ persistence:
     # If not using a transcode PVC, specify emptyDir.medium="Memory" to use a tmpfs (in-memory)
     # Volume for /transcode. Warning! this will greatly increase the amount of memory the plex pod is using
     # AND it will count toward any ram pod/namespace limits. Additionally all data will be lost if/when the
-    # pod is moved to another node. --set persistence.transcode.emptyDir.medium="Memory" 
+    # pod is moved to another node. --set persistence.transcode.emptyDir.medium="Memory"
     emptyDir:
       medium: ""
   #   medium: "Memory"
@@ -295,3 +295,66 @@ proxy:
   # http: "http://proxy:8080"
   # https: "https://proxy:8080"
   # noproxy: "localhost,127.0.0.1,10.96.0.0/12,10.244.0.0/12"
+
+
+addons:
+  # https://github.com/ZeroQI/Lambda.bundle
+  lambda:
+    enabled: false
+    overwrite: true
+    configmap:
+      labels: {}
+      annotations: {}
+      # Right now you can't really change this, additionally the configmap data is
+      # not configurable.
+      name: install-lambda-sh
+    volume:
+      name: install-lambda
+      defaultMode: 493  # 0755 in octal permission notation
+      # Using mountPath & SubPath allow you to volume mount a configMap AS A FILE
+      # Unfortunately this also means that updates to the configMap are not automtically
+      # propagated to the file contents. But it's better then replacing the entire
+      # /etc/cont-init.d/ directory which is the "normal" behavior when doing volume
+      # mounts.
+      mountPath: /root/install-lambda.sh
+      subPath: install-lambda.sh
+  # https://github.com/ZeroQI/Absolute-Series-Scanner
+  AbsoluteSeriesScanner:
+    enabled: false
+    overwrite: true
+    configmap:
+      labels: {}
+      annotations: {}
+      # Right now you can't really change this, additionally the configmap data is
+      # not configurable.
+      name: install-absoluteseriesscanner-sh
+    volume:
+      name: install-absoluteseriesscanner
+      defaultMode: 493  # 0755 in octal permission notation
+      # Using mountPath & SubPath allow you to volume mount a configMap AS A FILE
+      # Unfortunately this also means that updates to the configMap are not automtically
+      # propagated to the file contents. But it's better then replacing the entire
+      # /etc/cont-init.d/ directory which is the "normal" behavior when doing volume
+      # mounts.
+      mountPath: /root/install-AbsoluteSeriesScanner.sh
+      subPath: install-AbsoluteSeriesScanner.sh
+  # https://github.com/ZeroQI/Absolute-Series-Scanner
+  hama:
+    enabled: false
+    overwrite: true
+    configmap:
+      labels: {}
+      annotations: {}
+      # Right now you can't really change this, additionally the configmap data is
+      # not configurable.
+      name: install-hama-sh
+    volume:
+      name: install-hama
+      defaultMode: 493  # 0755 in octal permission notation
+      # Using mountPath & SubPath allow you to volume mount a configMap AS A FILE
+      # Unfortunately this also means that updates to the configMap are not automtically
+      # propagated to the file contents. But it's better then replacing the entire
+      # /etc/cont-init.d/ directory which is the "normal" behavior when doing volume
+      # mounts.
+      mountPath: /root/install-hama.sh
+      subPath: install-hama.sh

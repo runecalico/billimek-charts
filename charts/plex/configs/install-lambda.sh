@@ -15,3 +15,4 @@ if [ -e "${CONFIG_DIR}/Library/Application Support/Plex Media Server/Plug-ins/${
     echo "Moving Plex Plug-in ${PINAME} to Plug-ins directory"
     mv "${PINAME}" "${CONFIG_DIR}/Library/Application Support/Plex Media Server/Plug-ins"
 fi
+chown -R 1000:1000 "${CONFIG_DIR}/Library/Application Support/Plex Media Server/Plug-ins"

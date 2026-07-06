@@ -87,6 +87,26 @@ service:
   # loadBalancerSourceRanges: []
   ## Set the externalTrafficPolicy in the Service to either Cluster or Local
   # externalTrafficPolicy: Cluster
+  webtools:
+    port: 33400 # TCP - HTTP
+    # default https - How to Handle.
+  dlna:
+    port: 32469 # TCP
+    port: 1900 # UDP
+  phtc: # Plex Companion
+    port: 3005 # TCP
+  avahi: # Bonjour/Avahi network discovery
+    port: 5353 # UDP
+  roku: # Plex for Roku 
+    port:  # TCP
+  gdm: # Plex's custom GDM Network Discovery
+    port: 32410 # UDP
+    port: 32412 # UDP
+    port: 32413 # UDP
+    port: 32414 # UDP
+
+
+# How can we handle both UDP and TCP ports,  Kubernetes loadbalancer doesn't support BOTH udp and tcp ..
 
 ingress:
   enabled: false
@@ -358,3 +378,22 @@ addons:
       # mounts.
       mountPath: /root/install-hama.sh
       subPath: install-hama.sh
+  webtools:
+    enabled: false
+    overwrite: true
+    configmap:
+      labels: {}
+      annotations: {}
+      # Right now you can't really change this, additionally the configmap data is
+      # not configurable.
+      name: install-webtools-sh
+    volume:
+      name: install-webtools
+      defaultMode: 493  # 0755 in octal permission notation
+      # Using mountPath & SubPath allow you to volume mount a configMap AS A FILE
+      # Unfortunately this also means that updates to the configMap are not automtically
+      # propagated to the file contents. But it's better then replacing the entire
+      # /etc/cont-init.d/ directory which is the "normal" behavior when doing volume
+      # mounts.
+      mountPath: /root/install-webtools.sh
+      subPath: install-webtools.sh

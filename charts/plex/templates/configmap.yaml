@@ -106,3 +106,25 @@ data:
 # a different file or something.
 {{ (tpl (.Files.Glob "configs/install-hama.sh").AsConfig . ) | indent 2 }}
 {{- end -}}
+
+{{- if .Values.addons.webtools.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.addons.webtools.configmap.name }}
+  labels:
+    {{- include "plex.labels" . | nindent 4 }}
+{{- if .Values.addons.webtools.configmap.labels }}
+{{ toYaml .Values.addons.webtools.configmap.labels | indent 4 }}
+{{- end }}
+{{- with .Values.addons.webtools.configmap.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+
+data:
+# At some point figure out how to use a value/Variable here to be able to specify
+# a different file or something.
+{{ (tpl (.Files.Glob "configs/install-webtools.sh").AsConfig . ) | indent 2 }}
+{{- end -}}

@@ -35,7 +35,7 @@ spec:
     {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-  {{- if or .Values.certificate.pkcsMangler.enabled .Values.addons.lambda.enabled .Values.addons.AbsoluteSeriesScanner.enabled .Values.addons.hama.enabled }}
+  {{- if or .Values.certificate.pkcsMangler.enabled .Values.addons.webtools.enabled .Values.addons.lambda.enabled .Values.addons.AbsoluteSeriesScanner.enabled .Values.addons.hama.enabled }}
       initContainers:
       # This is ugly, but it does work to create a pks file that will work with PLEX from the tls.crt and tls.key that cert-manager normally creates
       {{- if .Values.certificate.pkcsMangler.enabled }}
@@ -139,6 +139,31 @@ spec:
             mountPath: {{ .Values.addons.AbsoluteSeriesScanner.volume.mountPath }}
             subPath: {{ .Values.addons.AbsoluteSeriesScanner.volume.subPath }}
       {{- end }}
+      {{- if .Values.addons.webtools.enabled }}
+      - name: webtools-init-container
+        image: alpine:latest
+        imagePullPolicy: Always
+        command: ["/bin/sh"]
+        args: ["-c", "{{ .Values.addons.webtools.volume.mountPath }}"]
+        env:
+          - name: "OVERWRITE_EXISTING_PLUGIN"
+            value: "true"
+          - name: "TMPDIR"
+            value: "/tmp"
+          - name: "CONFIG_DIR"
+            value: "/config"
+          - name: "PINAME"
+            value: "WebTools.bundle"
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          {{- if .Values.persistence.config.subPath }}
+            subPath: {{ .Values.persistence.config.subPath }}
+          {{ end }}
+          - name: {{ .Values.addons.webtools.volume.name }}
+            mountPath: {{ .Values.addons.webtools.volume.mountPath }}
+            subPath: {{ .Values.addons.webtools.volume.subPath }}
+      {{- end }}
   {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -149,6 +174,10 @@ spec:
           ports:
             - name: pms
               containerPort: 32400
+            {{- if .Values.addons.webtools.enabled }}
+            - name: webtools
+              containerPort: {{ .Values.service.webtools.port }}
+            {{- end }}   
           env:
           - name: TZ
             value: "{{ .Values.timezone }}"
@@ -361,6 +390,12 @@ spec:
       - name: {{ .Values.certificate.pkcsMangler.certificateSecret.volume.name }}
         secret:
           secretName: {{ .Values.certificate.pkcsMangler.certificateSecret.name  }}
+      {{- end }}
+      {{- if .Values.addons.webtools.enabled }}
+      - name: {{ .Values.addons.webtools.volume.name }}
+        configMap:
+          name: {{ .Values.addons.webtools.configmap.name }}
+          defaultMode: {{ .Values.addons.webtools.volume.defaultMode }}
       {{- end }}
 ##### VOLUMES END  #####
     {{- with .Values.affinity }}
